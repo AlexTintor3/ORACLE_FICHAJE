@@ -1,0 +1,58 @@
+CREATE OR REPLACE TRIGGER TriggerNotificacion
+    BEFORE INSERT
+    ON semana
+    FOR EACH ROW
+    DECLARE
+        v_horas_extras NUMBER;
+        v_falta_horas NUMBER;
+BEGIN
+    IF :new.horas_semanales >35 THEN 
+        insert into notificacion values (null,:new.id_empleado,'Jornada sobrepasada: '||:new.horas_semanales);
+    END IF;
+    IF :new.horas_semanales <35 THEN
+    insert into notificacion values (null,:new.id_empleado,'Jornada : '||:new.horas_semanales);
+    END IF;
+END TriggerNotificacion;
+
+
+
+
+CREATE OR REPLACE TRIGGER TriggerNotificacion
+    BEFORE INSERT
+    ON semana
+    FOR EACH ROW
+    DECLARE
+        v_horas_extras VARCHAR2:=0;
+        v_falta_horas VARCHAR2:=0;
+        v_total_extras VARCHAR2:=0;
+        v_total_restantes VARCHAR2:=0;
+        
+BEGIN
+    select distinct horas_semanales into v_horas_extras from semana 
+    where horas_semanales=:new.horas_semanales
+    and horas_semanales>35;
+        v_total_extras:=v_horas_extras - 35;
+    insert into notificacion values (null,:new.id_empleado,v_total_extras);
+    
+    select distinct horas_semanales into v_falta_horas from semana 
+    where horas_semanales=:new.horas_semanales
+    and horas_semanales<35;
+        v_total_restantes:=35 - v_falta_horas;
+    insert into notificacion VALUES (null,:new.id_empleado,v_total_restantes);
+    
+END TriggerNotificacion;
+
+
+
+
+
+
+
+if
+    select distinct horas_semanales into v_falta_horas from semana 
+    where horas_semanales<35
+    and horas_semanales=:new.horas_semanales;
+        v_falta_horas:=:35 - :new.horas_semanales;
+    then
+    INSERT INTO notificacion VALUES (null,:new.id_empleado,v_total2);
+    
