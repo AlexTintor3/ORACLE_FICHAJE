@@ -1,0 +1,6 @@
+CREATE TRIGGER TriggerAutoinc_Fichaje
+BEFORE INSERT ON fichaje
+FOR EACH ROW
+BEGIN
+SELECT AutoIncFichaje.NEXTVAL INTO :NEW.id_fichaje FROM DUAL;
+END;
